@@ -97,7 +97,7 @@ void loop()
   if (reciever_on && irrecv.decode(&results)) // Check if a signal ireceived
   {
     Serial.println("Signal received");
-    if (results.value == 0xA7ADEA2B) // Check if the received signal matches the "turn on" code
+    if (results.value == 0xFFFFFFFF) // Check if the received signal matches the "turn on" code
     {
       send("Shot"); //RF transmitter
       delay(1000);
