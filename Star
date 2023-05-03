@@ -4,27 +4,6 @@
 #include <LCDIC2.h>
 #include <Adafruit_NeoPixel.h> // Include the neopixel library
 
-void setup()
-{
-  // Initialize the IO and ISR for RF transmitter
-  vw_setup(2000); // Bits per sec
-}
-
-void loop()
-{
-  send("Shot"); //RF transmitter
-  delay(1000);
-}
-
-void send (char *message) //for  RF transmitter
-{
-  vw_send((uint8_t *)message, strlen(message));
-  vw_wait_tx(); // Wait until the whole message is gone
-}
-
-
-
-
 int score = 0;
 int RECV_PIN = 13; // Define the pin to which the IR receiver is connected
 int LED_PIN[] = {6}; // Define the pins to which the LEDs are connected
@@ -44,6 +23,10 @@ void setup()
 {
   Serial.begin(9600); // Initialize the serial communication
   irrecv.enableIRIn(); // Enable the IR receiver
+  // Initialize the IO and ISR for RF transmitter
+  vw_setup(2000); // Bits per sec
+  
+  //move to display
   for (int i = 0; i < NUM_LEDS; i++) // Loop through all the LEDs
   {
     pinMode(LED_PIN[i], OUTPUT); // Set the LED pin as an output
@@ -116,6 +99,8 @@ void loop()
     Serial.println("Signal received");
     if (results.value == 0xA7ADEA2B) // Check if the received signal matches the "turn on" code
     {
+      send("Shot"); //RF transmitter
+      delay(1000);
       changeLEDS(LOW);
       pixels.setPixelColor(score, 255, 0, 0);
       pixels.show();
@@ -129,4 +114,10 @@ void loop()
     }
     irrecv.resume();
   }
+}
+
+void send (char *message) //for  RF transmitter
+{
+  vw_send((uint8_t *)message, strlen(message));
+  vw_wait_tx(); // Wait until the whole message is gone
 }
