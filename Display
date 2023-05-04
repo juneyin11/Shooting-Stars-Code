@@ -18,6 +18,9 @@ void setup()
   // Initialize the IO and ISR for RF receiver
   vw_setup(2000); // Bits per sec
   vw_rx_start(); // Start the receiver
+  pixels.begin();
+  pixels.setBrightness(100);
+  pixels.show();
 }
 
 void loop()
