@@ -60,6 +60,12 @@ void updateLCD() {
   lcd.print("Score: " + String(score));
 }
 
+void send (char *message) //for  RF transmitter
+{
+  vw_send((uint8_t *)message, strlen(message));
+  vw_wait_tx(); // Wait until the whole message is gone
+}
+
 // Stuff not to touch
 int last_on_time = 0;
 int last_off_time = 0;
@@ -114,10 +120,4 @@ void loop()
     }
     irrecv.resume();
   }
-}
-
-void send (char *message) //for  RF transmitter
-{
-  vw_send((uint8_t *)message, strlen(message));
-  vw_wait_tx(); // Wait until the whole message is gone
 }
