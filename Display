@@ -1,7 +1,18 @@
 #include <VirtualWire.h>
+#include <Wire.h> 
+#include <LCDIC2.h>
+#include <Adafruit_NeoPixel.h> // Include the neopixel library
 
 byte message[VW_MAX_MESSAGE_LEN]; // a buffer to store the incoming messages
 byte messageLength = VW_MAX_MESSAGE_LEN; // the size of the message
+int score = 0;
+int NUM_LEDS = 1; // Define the number of LEDs
+#define PIN 9 // On Trinket or Gemma, suggest changing this to 1
+#define NUMPIXELS 16 // Popular NeoPixel ring size
+int NUMS_LEDS = 8; // Number of LEDs in the strip
+Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+// #define DELAYVAL 500 // Time (in milliseconds) to pause between pixels
+decode_results results;
 
 void setup()
 {
@@ -9,17 +20,42 @@ void setup()
   // Initialize the IO and ISR for RF receiver
   vw_setup(2000); // Bits per sec
   vw_rx_start(); // Start the receiver
+  for (int i = 0; i < NUM_LEDS; i++) // Loop through all the LEDs
+  {
+    pinMode(LED_PIN[i], OUTPUT); // Set the LED pin as an output
+    digitalWrite(LED_PIN[i], HIGH); // Turn on the LED initially
+  }
 }
+
+void changeLEDS(uint8_t val)
+{
+  for (int i = 0; i < NUM_LEDS; i++) // Loop through all the LEDs
+      {
+        digitalWrite(LED_PIN[i], val); // Turn on the current LED
+      }
+}
+
+
+// Stuff not to touch
+int last_on_time = 0;
+int last_off_time = 0;
+bool reciever_on = false;
+
 
 void loop()
 {
-  if (vw_get_message(message, &messageLength)) // code for RF receiver
+  if (reciever_on && (vw_get_message(message, &messageLength))) // Check if a signal received from RF receiver
   {
-    Serial.print("Received: ");
-    for (int i = 0; i < messageLength; i++)
-    {
-      Serial.write(message[i]);
-    }
-    Serial.println();
+    Serial.println("Signal received");
+    delay(1000);
+    changeLEDS(LOW);
+    pixels.setPixelColor(score, 255, 0, 0);
+    pixels.show();
+    score += 1;
+    Serial.println("Score updated: " + String(score));
+    next_wait_time = random(0, 5000);
+    reciever_on = false;
+    last_off_time = now;
   }
 }
+
