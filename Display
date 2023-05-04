@@ -44,7 +44,7 @@ bool reciever_on = false;
 
 void loop()
 {
-  if (reciever_on && (vw_get_message(message, &messageLength))) // Check if a signal received from RF receiver
+  if (reciever_on && vw_get_message(message, &messageLength)) // Check if a signal received from RF receiver
   {
     Serial.println("Signal received");
     delay(1000);
