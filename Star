@@ -81,7 +81,6 @@ void loop()
     if (results.value == 0xFFFFFFFF) // Check if the received signal matches the "turn on" code
     {
       send("Shot"); //RF transmitter
-      delay(1000);
       changeLEDS(LOW);
       next_wait_time = random(0, 5000);
       reciever_on = false;
