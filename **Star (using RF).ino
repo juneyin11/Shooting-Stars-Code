@@ -1,13 +1,15 @@
 #include <VirtualWire.h>
 #include <IRremote.h>
 #include <Wire.h> 
-// #include <LCDIC2.h>
+#include <LCDIC2.h>
 #include <Adafruit_NeoPixel.h> // Include the neopixel library
 
 int score = 0;
 int RECV_PIN = 13; // Define the pin to which the IR receiver is connected
-int LED_PIN[] = {6}; // Define the pins to which the LEDs are connected
-int NUM_LEDS = 1; // Define the number of LEDs
+#define PIN 9 // For led lights
+#define NUMPIXELS 16 // Popular NeoPixel ring size
+int NUMS_LEDS = 8; // Number of LEDs in the strip
+Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
 // #define DELAYVAL 500 // Time (in milliseconds) to pause between pixels
 IRrecv irrecv(RECV_PIN);
@@ -20,28 +22,25 @@ void setup()
   // Initialize the IO and ISR for RF transmitter
   vw_setup(2000); // Bits per sec
   //LED stuff
-
-  for (int i = 0; i < NUM_LEDS; i++) // Loop through all the LEDs
-  {
-    pinMode(LED_PIN[i], OUTPUT); // Set the LED pin as an output
-    digitalWrite(LED_PIN[i], HIGH); // Turn on the LED initially
-  }
+  pixels.begin();
+  pixels.setBrightness(10);
+  pixels.show();
 }
 
-void changeLEDS(uint8_t val)
-{
-  for (int i = 0; i < NUM_LEDS; i++) // Loop through all the LEDs
-      {
-        digitalWrite(LED_PIN[i], val); // Turn on the current LED
-      }
-}
+// void changeLEDS(uint8_t val)
+// {
+//   for (int i = 0; i < NUM_LEDS; i++) // Loop through all the LEDs
+//       {
+//         digitalWrite(LED_PIN[i], val); // Turn on the current LED
+//       }
+// }
 
 void send (char *message) //for  RF transmitter
 {
   vw_send((uint8_t *)message, strlen(message));
   vw_wait_tx(); // Wait until the whole message is gone
-  Serial.println("sent");
 }
+
 
 // Stuff not to touch
 int last_on_time = 0;
@@ -61,7 +60,8 @@ void loop()
     // If the time diff between now and the last time it was turned on is greater than max_on_time, turn off the LEDS and wait a random amount of time to turn back on
     if (now - last_on_time >= max_on_time){
       Serial.println("Whoops waited too long");
-      changeLEDS(LOW);
+      pixels.clear();
+      pixels.show();
       reciever_on = false;
       last_off_time = now;
       next_wait_time = random(0, 5000);
@@ -72,7 +72,8 @@ void loop()
   if (!reciever_on && now - last_off_time >= next_wait_time)
   {
     Serial.println("On and waiting for signal");
-    changeLEDS(HIGH);
+    pixels.fill(pixels.Color(255, 255, 0));
+    pixels.show();
     reciever_on = true;
     last_on_time = now;
   }
@@ -80,14 +81,16 @@ void loop()
   if (reciever_on && irrecv.decode(&results)) // Check if a signal ireceived
   {
     Serial.println("Signal received");
-    // if (results.value == 0xFFFFFFFF) // Check if the received signal matches the "turn on" code
-    // {
+    if (results.value == 0xA7ADEA2B) // Check if the received signal matches the "turn on" code
+    {
       send("Shot"); //RF transmitter
-      changeLEDS(LOW);
+      Serial.println("Signal Sent");
+      pixels.clear();
+      pixels.show();
       next_wait_time = random(0, 5000);
       reciever_on = false;
       last_off_time = now;
-    // }
+    }
     irrecv.resume();
   }
 }
