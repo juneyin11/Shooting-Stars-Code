@@ -1,7 +1,6 @@
 #include <VirtualWire.h>
 #include <IRremote.h>
 #include <Wire.h> 
-#include <LCDIC2.h>
 #include <Adafruit_NeoPixel.h> // Include the neopixel library
 
 int score = 0;
@@ -59,7 +58,7 @@ void loop()
   if (reciever_on){
     // If the time diff between now and the last time it was turned on is greater than max_on_time, turn off the LEDS and wait a random amount of time to turn back on
     if (now - last_on_time >= max_on_time){
-      Serial.println("Whoops waited too long");
+      //Serial.println("Whoops waited too long");
       pixels.clear();
       pixels.show();
       reciever_on = false;
@@ -84,12 +83,13 @@ void loop()
     if (results.value == 0xA7ADEA2B) // Check if the received signal matches the "turn on" code
     {
       send("Shot"); //RF transmitter
-      Serial.println("Signal Sent");
+      Serial.println("Signal Sent"); //sometimes not working
       pixels.clear();
       pixels.show();
       next_wait_time = random(0, 5000);
       reciever_on = false;
       last_off_time = now;
+
     }
     irrecv.resume();
   }
