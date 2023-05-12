@@ -7,7 +7,7 @@
 int score = 0;
 #define PIN 9 // For led lights
 #define NUMPIXELS 16 // Popular NeoPixel ring size
-int NUMS_LEDS = 20; // Number of LEDs in the strip
+int NUMS_LEDS = 20; // Number of LEDs in the strip MAKE SURE GROUND CONNECTED TO BOTH POWER SOURCE AND ARDUINO GROUND
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
 unsigned long startTime;
